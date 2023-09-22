@@ -16,20 +16,33 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +59,16 @@ import coil.compose.AsyncImage
 import com.example.learncompose.ui.theme.LearnComposeTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,11 +97,14 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun HomeScreen() {
     Column(modifier = Modifier.padding(16.dp)) {
         ImageCompose()
-        SimpleButton()
-        RadioButtonCompose()
+//        SimpleButton()
+//        RadioButtonCompose()
+        TextFieldCompose()
+        OutlineTextFieldCompose()
     }
 }
-// ******************************
+
+// ****************************** Image
 @Composable
 fun ImageCompose() {
     //    load image from local
@@ -115,7 +141,7 @@ fun ImageCompose() {
 
 }
 
-// ******************************
+// ****************************** Button
 @Composable
 fun SimpleButton() {
     OutlinedButton(
@@ -150,7 +176,7 @@ fun SimpleButton() {
     }
 }
 
-// ******************************
+// ****************************** Radio
 @Composable
 fun RadioButtonWithTextCompose(text: String) {
     var isSelected by remember {
@@ -176,13 +202,15 @@ fun RadioButtonWithTextCompose(text: String) {
 }
 
 @Composable
-fun CustomRadioButtonWithTextCompose(text: String, selected:Boolean, onClicK:() -> Unit) {
+fun CustomRadioButtonWithTextCompose(text: String, selected: Boolean, onClicK: () -> Unit) {
 
     Row(
-        modifier = Modifier.selectable(
-            selected = selected,
-            onClick = onClicK,
-        ).padding(top = 8.dp)
+        modifier = Modifier
+            .selectable(
+                selected = selected,
+                onClick = onClicK,
+            )
+            .padding(top = 8.dp)
     ) {
         val icon = if (selected) {
             Icons.Default.CheckCircle
@@ -206,7 +234,74 @@ fun RadioButtonCompose() {
     }
 }
 
-// ******************************
+// ****************************** TextField
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun TextFieldCompose() {
+    var keyboardController = LocalSoftwareKeyboardController.current
+    var text by remember { mutableStateOf("") }
+    TextField(
+        value = text,
+        onValueChange = { newText -> text = newText },
+        label = { Text("Name") },
+        placeholder = { Text("Enter...") },
+        textStyle = TextStyle(
+            color = Color.Black, fontWeight = FontWeight.W700, fontSize = 16.sp
+        ),
+        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+        trailingIcon = {
+            IconButton(onClick = {
+                text = ""
+            }) {
+                Icon(Icons.Default.Close, contentDescription = null)
+            }
+        },
+        shape = RoundedCornerShape(16.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+        ),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done, keyboardType = KeyboardType.Text
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+            },
+        )
+    )
+}
+
+// ****************************** OutlineTextField
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OutlineTextFieldCompose() {
+    var text by remember { mutableStateOf("") }
+    var isShowTextValue by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = text,
+        onValueChange = { newText -> text = newText },
+        label = { Text("Password") },
+        placeholder = { Text("Enter...") },
+        textStyle = TextStyle(
+            color = Color.Black, fontWeight = FontWeight.W700, fontSize = 16.sp
+        ),
+        visualTransformation = if(isShowTextValue) VisualTransformation.None else PasswordVisualTransformation(),
+        leadingIcon = { Icon(Icons.Default.Call, contentDescription = null) },
+        trailingIcon = {
+            IconButton(onClick = {
+                isShowTextValue = !isShowTextValue
+            }) {
+                val icon = if (isShowTextValue) Icons.Default.Face else Icons.Default.Lock
+                Icon(icon, contentDescription = null)
+            }
+        },
+        shape = RoundedCornerShape(16.dp),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done, keyboardType = KeyboardType.Phone
+        ),
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
