@@ -17,10 +17,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
@@ -45,7 +43,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,12 +53,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -75,11 +70,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.example.learncompose.ui.catalog.category.CategoryScreen
+import com.example.learncompose.ui.catalog.product.ProductDetailScreen
+import com.example.learncompose.ui.customer.AddressDetailScreen
+import com.example.learncompose.ui.customer.MyAccountScreen
+import com.example.learncompose.ui.home.CheckoutScreen
+import com.example.learncompose.ui.home.HomeScreen
 import com.example.learncompose.ui.theme.LearnComposeTheme
 
 class MainActivity : ComponentActivity() {
@@ -91,7 +96,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = Color.White
                 ) {
-                    HomeScreen()
+                    MainApp()
                 }
             }
         }
@@ -99,14 +104,76 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!", modifier = modifier
-    )
+fun MainApp() {
+    val navController = rememberNavController()
+    LearnComposeTheme {
+        NavHost(navController = navController, startDestination = "Home") {
+            composable("Home") {
+                HomeScreen(
+                    openCategoryAction = {
+                        navController.navigate("Category")
+                    },
+                    openMyAccountScreen = {},
+                    editCustomerInfo = {},
+                    navController = navController
+                )
+            }
+            composable("Category") {
+                CategoryScreen(openProductDetail = { productId ->
+                    navController.navigate("ProductDetail/$productId")
+                })
+            }
+            composable("MyAccount") {
+                MyAccountScreen(navController = navController, openAddressScreen = { addressId ->
+                    val route =
+                        if (addressId != null) "AddressDetail?addressId=$addressId" else "AddressDetail"
+                    navController.navigate(route)
+                })
+            }
+            composable(
+                "ProductDetail/{productId}",
+                arguments = listOf(navArgument("productId") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                val productId = navBackStackEntry.arguments?.getString("productId")
+                requireNotNull(productId)
+                ProductDetailScreen(productId = productId, checkout = { cartId, customerId ->
+                    navController.navigate("Checkout/$cartId/$customerId")
+                })
+            }
+            composable(
+                "Checkout/{cartId}/{customerId}",
+                arguments = listOf(navArgument("cartId") { type = NavType.StringType },
+                    navArgument("customerId") { type = NavType.StringType }
+                )
+            ) { navBackStackEntry ->
+                val cartId = navBackStackEntry.arguments?.getString("cartId")
+                val customerId = navBackStackEntry.arguments?.getString("customerId")
+                requireNotNull(cartId)
+                requireNotNull(customerId)
+                CheckoutScreen(cartId = cartId, customerId = customerId, placeOrderAction = {})
+            }
+            composable("AddressDetail?addressId={addressId}",
+                arguments = listOf(
+                    navArgument("addressId") {
+                        nullable = true
+                    }
+                )
+            ) { navBackStackEntry ->
+                val addressId = navBackStackEntry.arguments?.getString("addressId")
+                AddressDetailScreen(addressId = addressId, saveAddressAndBack = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("new_address_id", it)
+                    navController.popBackStack()
+                })
+            }
+
+        }
+    }
 }
 
 @Composable
-fun HomeScreen() {
+fun HomeLearnScreen() {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -114,21 +181,20 @@ fun HomeScreen() {
             .verticalScroll(rememberScrollState())
     ) {
         TextCompose()
-//        ImageCompose()
-//        SimpleButton()
-//        RadioButtonCompose()
-//        TextFieldCompose()
-//        OutlineTextFieldCompose()
+        ImageCompose()
+        SimpleButton()
+        RadioButtonCompose()
+        TextFieldCompose()
+        OutlineTextFieldCompose()
         LayoutCompose()
         ConstraintLayoutCompose()
     }
 }
 
 // ****************************** Text, Multiple text style
-
 @Composable
 fun TextCompose() {
-    Row() {
+    Row {
         Text(
             text = "Hello world!", color = Color.DarkGray, modifier = Modifier.padding(
                 end = 16.dp
@@ -155,7 +221,7 @@ fun ImageCompose() {
     //    load image from local
     Image(painterResource(id = R.drawable.banner), contentDescription = "Alone Tree")
 
-    Row() {
+    Row {
         //    load image from url
         AsyncImage(model = "https://www.w3schools.com/css/img_5terre.jpg",
             contentDescription = "Logo",
@@ -210,7 +276,7 @@ fun SimpleButton() {
             defaultElevation = 10.dp, pressedElevation = 20.dp, disabledElevation = 0.dp
         ),
     ) {
-        Column() {
+        Column {
             Image(imageVector = Icons.Filled.Call, contentDescription = null)
             Text(text = "Default button", color = Color.Magenta)
         }
@@ -288,13 +354,14 @@ fun TextFieldCompose() {
     TextField(
         value = text,
         onValueChange = { newText -> text = newText },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
         label = { Text("Name") },
         placeholder = { Text("Enter...") },
         textStyle = TextStyle(
-            color = Color.Black, fontWeight = FontWeight.W700, fontSize = 16.sp
+            color = Color.White, fontWeight = FontWeight.W700, fontSize = 16.sp
         ),
-
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
         trailingIcon = {
             IconButton(onClick = {
@@ -333,6 +400,7 @@ fun OutlineTextFieldCompose() {
         textStyle = TextStyle(
             color = Color.Black, fontWeight = FontWeight.W700, fontSize = 16.sp
         ),
+        modifier = Modifier.padding(top = 8.dp),
         visualTransformation = if (isShowTextValue) VisualTransformation.None else PasswordVisualTransformation(),
         leadingIcon = { Icon(Icons.Default.Call, contentDescription = null) },
         trailingIcon = {
@@ -353,7 +421,7 @@ fun OutlineTextFieldCompose() {
 // ****************************** Layout: Box, Column, Row, Scroll
 @Composable
 fun LayoutCompose() {
-    Column() {
+    Column {
         OutlineTextFieldCompose()
         TextFieldCompose()
     }
@@ -387,10 +455,22 @@ fun ConstraintLayoutCompose() {
 
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    LearnComposeTheme {
-        HomeScreen()
-    }
+fun LazyRowCompose() {
+
+}
+
+@Composable
+fun LazyColumnCompose() {
+
+}
+
+@Composable
+fun LazyVerticalGridCompose() {
+
+}
+
+@Composable
+fun LazyHorizontalGridCompose() {
+
 }
