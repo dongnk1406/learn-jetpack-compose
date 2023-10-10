@@ -1,6 +1,5 @@
 package com.example.learncompose.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,18 +17,21 @@ import androidx.navigation.NavHostController
 fun HomeScreen(
     openCategoryAction: () -> Unit,
     openMyAccountScreen: () -> Unit,
-    editCustomerInfo: () -> Unit,
     navController: NavHostController? = null
 ) {
-    fun funTest() {
-        Log.d("dTag", "Press me")
-    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Home Screen")
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(onClick = {
+            navController?.navigate("LearnCommonCompose")
+        }) {
+            Text(text = "Open learn common compose")
+        }
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = { openCategoryAction() }) {
             Text("Open Category")
@@ -43,9 +45,9 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = {
-            editCustomerInfo()
+            navController?.navigate("Test")
         }) {
-            Text(text = "Edit customer information")
+            Text(text = "Go to test screen")
         }
     }
 }
