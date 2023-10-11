@@ -31,8 +31,9 @@ fun TestScreen(
         }) {
             Text(text = "Back", color = LocalAppColor.current.bodyTextColor)
         }
+        Text(text = "Default title text color", color = LocalAppColor.current.titleTextColor)
         Text(
-            text = "This is test screen with title color is ${LocalAppColor.current.titleTextColor}",
+            text = "Random text color",
             style = TextStyle(
                 color = bodyTextColor
             )

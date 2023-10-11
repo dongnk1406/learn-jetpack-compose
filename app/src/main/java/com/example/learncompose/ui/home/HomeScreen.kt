@@ -1,29 +1,32 @@
 package com.example.learncompose.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
 fun HomeScreen(
     openCategoryAction: () -> Unit,
-    openMyAccountScreen: () -> Unit,
     navController: NavHostController? = null
 ) {
-
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = "Home Screen")
         Spacer(modifier = Modifier.height(24.dp))
@@ -47,7 +50,7 @@ fun HomeScreen(
         Button(onClick = {
             navController?.navigate("Test")
         }) {
-            Text(text = "Go to test screen")
+            Text(text = "Go to test screen", style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
