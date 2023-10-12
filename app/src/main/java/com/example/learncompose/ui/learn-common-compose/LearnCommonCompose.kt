@@ -1,4 +1,4 @@
-package com.example.learncompose.`learn-common-compose`
+package com.example.learncompose.ui.`learn-common-compose`
 
 import android.util.Log
 import androidx.compose.foundation.Image
