@@ -203,7 +203,6 @@ fun AppTopBar(toggleDrawer: () -> Unit) {
 //    Text(text = "Top Bar", style = TextStyle(color = Color.Red))
 }
 
-
 @Composable
 fun AppBottomBar() {
     BottomAppBar(
