@@ -65,8 +65,7 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 CompositionLocalProvider(
                     LocalAppColor provides AppColor(
-                        bodyTextColor = Color.Black,
-                        titleTextColor = Color.Red
+                        bodyTextColor = Color.Black, titleTextColor = Color.Red
                     )
                 ) {
                     MainApp()
@@ -113,8 +112,7 @@ fun AppNavigator(modifier: Modifier) {
             HomeScreen(
                 openCategoryAction = {
                     navController.navigate("Category")
-                },
-                navController = navController
+                }, navController = navController
             )
         }
         composable("LearnCommonCompose") {
@@ -145,8 +143,7 @@ fun AppNavigator(modifier: Modifier) {
         composable(
             "Checkout/{cartId}/{customerId}",
             arguments = listOf(navArgument("cartId") { type = NavType.StringType },
-                navArgument("customerId") { type = NavType.StringType }
-            )
+                navArgument("customerId") { type = NavType.StringType })
         ) { navBackStackEntry ->
             val cartId = navBackStackEntry.arguments?.getString("cartId")
             val customerId = navBackStackEntry.arguments?.getString("customerId")
@@ -154,18 +151,14 @@ fun AppNavigator(modifier: Modifier) {
             requireNotNull(customerId)
             CheckoutScreen(cartId = cartId, customerId = customerId, placeOrderAction = {})
         }
-        composable("AddressDetail?addressId={addressId}",
-            arguments = listOf(
-                navArgument("addressId") {
-                    nullable = true
-                }
-            )
+        composable(
+            "AddressDetail?addressId={addressId}", arguments = listOf(navArgument("addressId") {
+                nullable = true
+            })
         ) { navBackStackEntry ->
             val addressId = navBackStackEntry.arguments?.getString("addressId")
             AddressDetailScreen(addressId = addressId, saveAddressAndBack = {
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("new_address_id", it)
+                navController.previousBackStackEntry?.savedStateHandle?.set("new_address_id", it)
                 navController.popBackStack()
             })
         }
@@ -180,10 +173,9 @@ fun AppNavigator(modifier: Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(toggleDrawer: () -> Unit) {
-    TopAppBar(
-        title = {
-            Text(text = "Title", style = TextStyle(color = Color.White))
-        },
+    TopAppBar(title = {
+        Text(text = "Title", style = TextStyle(color = Color.White))
+    },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
         navigationIcon = {
             IconButton(onClick = { toggleDrawer() }) {
@@ -197,29 +189,30 @@ fun AppTopBar(toggleDrawer: () -> Unit) {
             IconButton(onClick = { }) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = "", tint = Color.White)
             }
-        }
-    )
+        })
 //    You can use your custom top bar
 //    Text(text = "Top Bar", style = TextStyle(color = Color.Red))
 }
 
 @Composable
 fun AppBottomBar() {
+//    https://www.c-sharpcorner.com/article/material-3-bottom-navigation-bar-in-jetpack-compose/
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.primary,
         contentPadding = PaddingValues(0.dp),
-        modifier = Modifier.clip(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+        modifier = Modifier.clip(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+        contentColor = Color.White
     ) {
-
-        Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()
+        ) {
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(1f)
-                    .clickable { }
-            ) {
-                Icon(Icons.Default.ShoppingCart, contentDescription = "", tint = Color.White)
+                    .clickable { }) {
+                Icon(Icons.Default.ShoppingCart, contentDescription = "")
                 Text(text = "Home")
             }
             Column(verticalArrangement = Arrangement.Center,
@@ -227,10 +220,9 @@ fun AppBottomBar() {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(1f)
-                    .clickable { }
-            ) {
+                    .clickable { }) {
 
-                Icon(Icons.Default.ShoppingCart, contentDescription = "", tint = Color.White)
+                Icon(Icons.Default.ShoppingCart, contentDescription = "")
                 Text(text = "Cart")
             }
             Column(verticalArrangement = Arrangement.Center,
@@ -238,9 +230,8 @@ fun AppBottomBar() {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(1f)
-                    .clickable { }
-            ) {
-                Icon(Icons.Default.ShoppingCart, contentDescription = "", tint = Color.White)
+                    .clickable { }) {
+                Icon(Icons.Default.ShoppingCart, contentDescription = "")
                 Text(text = "Chat")
             }
             Column(verticalArrangement = Arrangement.Center,
@@ -248,9 +239,8 @@ fun AppBottomBar() {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(1f)
-                    .clickable { }
-            ) {
-                Icon(Icons.Default.ShoppingCart, contentDescription = "", tint = Color.White)
+                    .clickable { }) {
+                Icon(Icons.Default.ShoppingCart, contentDescription = "")
                 Text(text = "Profile")
             }
         }
@@ -264,19 +254,13 @@ fun AppDrawer(
     content: @Composable () -> Unit
 ) {
     ModalNavigationDrawer(drawerContent = {
-        ModalDrawerSheet() {
+        ModalDrawerSheet {
             Text("Drawer title", modifier = Modifier.padding(16.dp))
             Divider()
-            NavigationDrawerItem(
-                label = { Text(text = "Item 1") },
+            NavigationDrawerItem(label = { Text(text = "Item 1") },
                 selected = true,
-                onClick = { toggleDrawer() }
-            )
-            NavigationDrawerItem(
-                label = { Text(text = "Item 2") },
-                selected = false,
-                onClick = { }
-            )
+                onClick = { toggleDrawer() })
+            NavigationDrawerItem(label = { Text(text = "Item 2") }, selected = false, onClick = { })
         }
     }, drawerState = drawerState) {
         content()

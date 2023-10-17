@@ -1,6 +1,5 @@
 package com.example.learncompose.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -187,6 +186,6 @@ private fun DraggableTextLowLevel() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun  DefaultPreview() {
+fun DefaultPreview() {
     HomeScreen(openCategoryAction = { /*TODO*/ })
 }
