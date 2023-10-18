@@ -1,20 +1,25 @@
 package com.example.learncompose.ui.home
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -23,6 +28,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,11 +38,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -89,6 +99,8 @@ fun HomeScreen(
         }) {
             Text(text = "Show bottom sheet")
         }
+        CoroutinesCompose()
+
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -129,8 +141,10 @@ fun ConstraintLayoutContent() {
         val (button, text1, text2) = createRefs()
         val verticalGuideline50 = createGuidelineFromTop(0.5f)
         val horizontalGuideline50 = createGuidelineFromStart(0.5f)
-
-        Button(onClick = { },
+        val localContext = LocalContext.current
+        Button(onClick = {
+            Toast.makeText(localContext, "This is default toast message", Toast.LENGTH_SHORT).show()
+        },
             // Assign reference "button" to the Button composable
             // and constrain it to the top of the ConstraintLayout
             modifier = Modifier.constrainAs(button) {
@@ -185,8 +199,52 @@ private fun DraggableTextLowLevel() {
     }
 }
 
+@Composable
+fun CoroutinesCompose() {
+    var loading by remember {
+        mutableStateOf(false)
+    }
+    var count by remember {
+        mutableIntStateOf(0)
+    }
+
+    val mainScope = CoroutineScope(Job() + Dispatchers.Main)
+    val ioScope = CoroutineScope(Job() + Dispatchers.IO)
+    val defaultScope = CoroutineScope(Job() + Dispatchers.Default)
+
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Button(onClick = { count++ }) {
+            Text(text = "Increase")
+        }
+        Text(text = count.toString(), modifier = Modifier.padding(horizontal = 16.dp))
+
+        Button(onClick = {
+            loading = !loading
+            mainScope.launch {
+                Log.d("dTag", "mainScope with thread: ${Thread.currentThread().name}")
+            }
+            ioScope.launch {
+                Log.d("dTag", "ioScope with thread: ${Thread.currentThread().name}")
+            }
+            defaultScope.launch {
+                Log.d("dTag", "defaultScope with thread: ${Thread.currentThread().name}")
+            }
+
+        }, modifier = Modifier.padding(end = 16.dp)) {
+            Text(text = if (loading) "Stop loading" else "Start loading")
+        }
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.width(20.dp),
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun  DefaultPreview() {
+fun DefaultPreview() {
     HomeScreen(openCategoryAction = { /*TODO*/ })
 }
+
